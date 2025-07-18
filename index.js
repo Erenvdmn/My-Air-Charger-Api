@@ -10,6 +10,7 @@ import  { randomInt }  from 'crypto';
 import authapp from './routes/auth.js';
 import { verifyToken } from './routes/auth.js';
 import { MONGO_URI } from "./helpers/config.js"
+import morgan from "morgan";
 
 
 
@@ -23,6 +24,11 @@ const PORT = 5000;
 app.use(cors());
 app.use(express.json());
 
+morgan.token('time', () => {
+  return new Date().toISOString();
+});
+
+app.use(morgan(':method :url :status - :response-time ms - Time: :time'));
 
 app.use('/auth',authapp)
 

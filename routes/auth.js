@@ -24,7 +24,8 @@ function verifyToken(token) {
 export { verifyToken };
 
 // Token verification middleware
-router.get('/verify-token', async (request, response) => {
+router.post('/verify-token', async (request, response) => {
+    const {attributes} = request.body;
     const authHeader = request.headers.authorization;
     console.log(request.headers);
     const token = authHeader?.startsWith('Bearer ') ? authHeader.slice(7) : authHeader;
@@ -42,6 +43,9 @@ router.get('/verify-token', async (request, response) => {
         if (!user) {
             return response.status(200).json({ message: 'Kullanıcı bulunamadı', done: false });
         }
+
+        user.attributes = attributes;
+        await user.save();
         response.status(200).json({ user, done: true });
     } catch (error) {
         console.error('Token doğrulama hatası:', error);
@@ -51,7 +55,7 @@ router.get('/verify-token', async (request, response) => {
 
 // Register
 router.post('/register', async (request, response) => {
-    const { name, surname, phone, birthdate, email } = request.body;
+    const { name, surname, phone, birthdate, email, attributes } = request.body;
     const code = 111111; // randomInt(100000, 999999).toString();
 
     if (!name || !surname || !phone || !birthdate || !email) {
@@ -82,6 +86,7 @@ router.post('/register', async (request, response) => {
             phone,
             birthdate,
             email,
+            attributes,
             verification:{
                 otpCode: code.toString()
             }

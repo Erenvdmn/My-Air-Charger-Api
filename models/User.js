@@ -24,12 +24,7 @@ const userSchema = new mongoose.Schema({
         unique: true
     },
     attributes: {
-        type: mongoose.Schema.Types.Mixed,
-        default: {
-            osVersion: '',
-            language: '',
-            opeVersion: '',
-        }
+        type: Object,
     },
     verification: {
         type: Object,
