@@ -112,6 +112,19 @@ router.post('/verify-phone', async (request, response) => {
     
     try {
         const existingUser = await User.findOne({ phone });
+
+        const now = new Date();
+        const otpSent = new Date(existingUser.verification.otpLastSent);
+
+        const lastSent = (now - otpSent) / 1000;
+
+        if (lastSent < 120 && existingUser.verification.otpCode) {
+            const remaining = Math.ceil(120 - lastSent);
+            return response.status(200).json({ 
+                message: `SMS gönderildi, ${remaining} saniye sonra tekrar deneyin`, 
+                done: false 
+            });
+        }
         if (!existingUser) {
             return response.status(200).json({ message: 'Telefon numarası bulunamadı', done: false });
         }
@@ -162,10 +175,17 @@ router.post('/verify-sms', async (request, response) => {
             return response.status(200).json({ message: 'Doğrulama kodu yanlış', done: false });
         }
 
-        user.verification.status = true;
-        user.verification.verifiedAt = new Date();
-        user.verification.otpCode = "";
-        await user.save();
+        await User.findOneAndUpdate(
+            { phone },
+            {
+                $set: {
+                'verification.status': true,
+                'verification.verifiedAt': new Date(),
+                }
+            },
+            { new: true }
+            );
+
         console.log(`SMS doğrulandı: ${user.phone} ile kod: ${code}`);
         
         const newToken = generateToken(user);

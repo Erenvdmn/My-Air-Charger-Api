@@ -14,7 +14,7 @@ export const AuthMiddleware = async (req, res, next) => {
 		}
 
 
-		console.log(`Token verified for user: ${token._id} on route: ${baseUrl}`);
+		console.log(`Token verified for user: ${token.id} on route: ${baseUrl}`);
 		
     const user = await User.findById(token.id);
     req.user = user;
