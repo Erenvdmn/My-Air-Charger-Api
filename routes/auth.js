@@ -2,6 +2,7 @@ import express from 'express';
 import jwt from 'jsonwebtoken';
 import User from '../models/User.js';
 import  { randomInt }  from 'crypto';
+import { AuthMiddleware } from '../helpers/middleware.js';
 
 
 const router = express.Router();
@@ -24,7 +25,7 @@ function verifyToken(token) {
 export { verifyToken };
 
 // Token verification middleware
-router.post('/verify-token', async (request, response) => {
+router.post('/verify-token', AuthMiddleware, async (request, response) => {
     const {attributes} = request.body;
     const authHeader = request.headers.authorization;
     console.log(request.headers);
@@ -54,7 +55,7 @@ router.post('/verify-token', async (request, response) => {
 });
 
 // Register
-router.post('/register', async (request, response) => {
+router.post('/register', AuthMiddleware, async (request, response) => {
     const { name, surname, phone, birthdate, email, attributes } = request.body;
     const code = 111111; // randomInt(100000, 999999).toString();
 
@@ -104,7 +105,7 @@ router.post('/register', async (request, response) => {
 
 
 // Phone verification
-router.post('/verify-phone', async (request, response) => {
+router.post('/verify-phone', AuthMiddleware, async (request, response) => {
     const { phone } = request.body;
     const code = "111111"; //randomInt(100000, 999999).toString();
 
@@ -156,7 +157,7 @@ router.post('/verify-phone', async (request, response) => {
 });
 
 // SMS verification
-router.post('/verify-sms', async (request, response) => {
+router.post('/verify-sms', AuthMiddleware, async (request, response) => {
     const { phone, code } = request.body;
    
     if (!code) {

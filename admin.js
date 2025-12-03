@@ -6,13 +6,14 @@ import Device from './models/Device.js';
 import DeviceReq from './models/DeviceReq.js';
 import { verifyToken } from './routes/auth.js';
 import { getAddressFromCoordinates } from './helpers/geocode.js';
+import { AuthMiddleware } from './helpers/middleware.js';
 
 
 const admin = express.Router();
 
 
 // Get address from coordinates
-admin.post('/get-address', async(request, response) => {
+admin.post('/get-address', AuthMiddleware, async(request, response) => {
     const { lat, lng } = request.body;
 
     if (!lat || !lng) {
@@ -34,7 +35,7 @@ admin.post('/get-address', async(request, response) => {
 });
 
 // add new place
-admin.post('/add-places', async(request, response) => {
+admin.post('/add-places', AuthMiddleware, async(request, response) => {
     const { name, description, location, workingHours, deviceCount, availableCount} = request.body;
 
     if (!name || !description || !location || !workingHours || !deviceCount || !availableCount) {
@@ -74,7 +75,7 @@ admin.post('/add-places', async(request, response) => {
 
 
 // update places
-admin.post('/update-places', async (request, response) => {
+admin.post('/update-places', AuthMiddleware, async (request, response) => {
     const { name, description, location, workingHours, deviceCount, availableCount, id } = request.body;
 
     if (!name || !description || !location || !workingHours || !deviceCount || !availableCount) {
@@ -119,7 +120,7 @@ admin.post('/update-places', async (request, response) => {
 
 
 // creating places table
-admin.get('/places-table', async(request, response) => {
+admin.get('/places-table', AuthMiddleware, async(request, response) => {
     try {
         const places = await Places.find().sort({ createdAt: -1});
         response.status(200).json({places, done:true})
@@ -131,7 +132,7 @@ admin.get('/places-table', async(request, response) => {
 
 
 // creating users table
-admin.get('/users-table', async(request, response) => {
+admin.get('/users-table', AuthMiddleware, async(request, response) => {
     try {
         const users = await User.find().sort({ createdAt: -1});
         response.status(200).json({users, done:true})
@@ -142,7 +143,7 @@ admin.get('/users-table', async(request, response) => {
 });
 
 // creating devices table
-admin.get('/device-table', async(request, response) => {
+admin.get('/device-table', AuthMiddleware, async(request, response) => {
     try {
         const devices = await Device.find().sort({sort: -1});
         response.status(200).json({devices, done:true})
